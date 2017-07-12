@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from sys import argv
 import gzip
 import io
@@ -12,14 +14,11 @@ def reverse_complement(sequence):
 
 
 def createHashTable(string, kmer):
-    #todo: include reverse complement of kmers
     kmer_table = {}
     sequence = string.strip('\n')
     for i in range(len(sequence)-kmer+1):
         new_mer =sequence[i:i+kmer]
         new_mer_rc = reverse_complement(new_mer)
-        #new_mer_b = new_mer.encode()
-        #new_mer_rc_b = new_mer_rc.encode()
         if new_mer in kmer_table:
             kmer_table[new_mer.upper()] += 1
         else:
