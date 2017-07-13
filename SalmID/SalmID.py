@@ -47,6 +47,7 @@ def target_read_kmerizer(file, k, kmerDict):
     # readFile = open('matching_reads.fastq', 'w')
     i = 1
     n_reads = 0
+    total_coverage = 0
     target_mers = []
     for line in io.BufferedReader(gzip.open(file)):
         start = int((len(line) - k) // 2)
@@ -54,16 +55,15 @@ def target_read_kmerizer(file, k, kmerDict):
             s1 = line[start:k + start].decode()
             if s1 in kmerDict:
                 n_reads += 1
+                total_coverage += len(line)
                 target_mers.append(set([k for k in createHashTable(str(line.decode()), k)]))
         i += 1
-        if i == 250000:
+        if total_coverage >= 10000:
             break
-    #print(n_reads)
     if len(target_mers) == 0:
         return 0
     else:
         return set.union(*target_mers)
-    # readFile.close()
 
 def main():
     ex_dir = os.path.dirname(os.path.realpath(__file__))
