@@ -77,7 +77,6 @@ def main():
     uniqmers_IIb = sets_dict['uniqmers_IIb']
     uniqmers_IIIa = sets_dict['uniqmers_IIIa']
     uniqmers_IIIb = sets_dict['uniqmers_IIIb']
-    uniqmers_IIIb = sets_dict['uniqmers_IIIb']
     uniqmers_IV = sets_dict['uniqmers_IV']
     uniqmers_VI = sets_dict['uniqmers_VI']
     uniqmers_VII = sets_dict['uniqmers_VII']
