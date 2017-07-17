@@ -86,7 +86,6 @@ def main():
     if target_mers == 0:
         print('No reads found matching invA, no Salmonella in sample?')
     else:
-        else:
         p_bongori = (1 - len(uniqmers_bongori - target_mers) / len(uniqmers_bongori)) * 100
         p_I = (1 - len(uniqmers_I - target_mers) / len(uniqmers_I)) * 100
         p_IIa = (1 - len(uniqmers_IIa - target_mers) / len(uniqmers_IIa)) * 100
