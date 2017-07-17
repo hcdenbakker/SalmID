@@ -84,52 +84,24 @@ def main():
     uniqmers_bongori = sets_dict['uniqmers_bongori']
     target_mers = target_read_kmerizer(query_fastq_gz, 27, allmers)
     if target_mers == 0:
-        p_bongori = 'no hits'
-    else:
-        p_bongori = (1 - len(uniqmers_bongori - target_mers)/len(uniqmers_bongori))*100
-
-    if target_mers == 0:
-        p_I = 'no hits'
-    else:
-        p_I = (1 - len(uniqmers_I - target_mers)/len(uniqmers_I))*100
-    if target_mers == 0:
-        p_IIIb = 'no hits'
-    else:
-        p_IIIb = (1 - len(uniqmers_IIIb - target_mers)/len(uniqmers_IIIb))*100
-    if target_mers == 0:
-        p_IIa = 'no hits'
-    else:
-        p_IIa = (1 - len(uniqmers_IIa - target_mers)/len(uniqmers_IIa))*100
-    if target_mers == 0:
-        p_IIb = 'no hits'
-    else:
-        p_IIb = (1 - len(uniqmers_IIb - target_mers)/len(uniqmers_IIb))*100
-
-    if target_mers == 0:
-        p_IIIa = 'no hits'
-    else:
-        p_IIIa = (1 - len(uniqmers_IIIa - target_mers)/len(uniqmers_IIIa))*100
-    if target_mers == 0:
-        p_VII = 'no hits'
-    else:
-        p_VII = (1 - len(uniqmers_VII - target_mers)/len(uniqmers_VII))*100
-    if target_mers == 0:
-        p_VI = 'no hits'
-    else:
-        p_VI = (1 - len(uniqmers_VI - target_mers)/len(uniqmers_VI))*100
-
-    if target_mers == 0:
-        p_IV = 'no hits'
-    else:
-        p_IV = (1 - len(uniqmers_IV - target_mers)/len(uniqmers_IV))*100
-    if target_mers == 0:
         print('No reads found matching invA, no Salmonella in sample?')
     else:
+        else:
+        p_bongori = (1 - len(uniqmers_bongori - target_mers) / len(uniqmers_bongori)) * 100
+        p_I = (1 - len(uniqmers_I - target_mers) / len(uniqmers_I)) * 100
+        p_IIa = (1 - len(uniqmers_IIa - target_mers) / len(uniqmers_IIa)) * 100
+        p_IIb = (1 - len(uniqmers_IIb - target_mers) / len(uniqmers_IIb)) * 100
+        p_IIIa = (1 - len(uniqmers_IIIa - target_mers) / len(uniqmers_IIIa)) * 100
+        p_IIIb = (1 - len(uniqmers_IIIb - target_mers) / len(uniqmers_IIIb)) * 100
+        p_VI = (1 - len(uniqmers_VI - target_mers) / len(uniqmers_VI)) * 100
+        p_IV = (1 - len(uniqmers_IV - target_mers) / len(uniqmers_IV)) * 100
+        p_VII = (1 - len(uniqmers_VII - target_mers) / len(uniqmers_VII)) * 100
+        p_VIII = (1 - len(uniqmers_VIII - target_mers) / len(uniqmers_VIII)) * 100
         print('S. bongori: ' + str(round(p_bongori, 1)) + ', Subsp. I: ' + str(round(p_I, 1)) +
              ', Subsp. IIIb: ' +str(round(p_IIIb, 1)) +', subsp. IIa: '+ str(round(p_IIa, 1)) +
              ', subsp. IIb: '+ str(round(p_IIb, 1)) +', subsp. IIIa: ' + str(round(p_IIIa, 1)) +
              ', Subsp. IV: ' + str(round(p_IV, 1)) + ', Subsp. VI: ' + str(round(p_VI, 1)) +
-              ', Subsp. VII: ' + str(round(p_VII, 1)))
+              ', Subsp. VII: ' + str(round(p_VII, 1)) + ', Subsp. VIII (prov.): ' + str(round(p_VIII, 1)))
 
 if __name__ == '__main__':
     main()
