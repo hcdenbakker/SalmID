@@ -81,6 +81,7 @@ def main():
     uniqmers_IV = sets_dict['uniqmers_IV']
     uniqmers_VI = sets_dict['uniqmers_VI']
     uniqmers_VII = sets_dict['uniqmers_VII']
+    uniqmers_VIII = sets_dict['uniqmers_VIII']
     uniqmers_bongori = sets_dict['uniqmers_bongori']
     target_mers = target_read_kmerizer(query_fastq_gz, 27, allmers)
     if target_mers == 0:
