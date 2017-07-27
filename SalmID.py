@@ -28,7 +28,7 @@ def parse_args():
 
     parser.add_argument(
         '-d','--input_dir', nargs='+', type=str, required=False, default='.',
-        help='Directory which contains data for identification, when not specified files in current directory')
+        help='Directory which contains data for identification, when not specified files in current directory will be analyzed.')
     return parser.parse_args()
 
 
