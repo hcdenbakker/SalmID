@@ -20,14 +20,14 @@ def parse_args():
     # inputs
     parser.add_argument(
         '-i','--input', nargs='+', type=str, required=False, default= 'None',
-        help='Single fastq.gz file input, include path to file if file is not in same directory ')
+        help='Single fastq.gz file input, include path to file if file is not in same directory ', metavar='')
     parser.add_argument(
         '-e', '--extension', nargs='+', type=str, required=False, default=['.fastq.gz'],
         help='File extension, if specified without "--input_dir", SalmID will attempt to ID all files\n' +
-             ' with this extension in current directory, otherwise files in input directory')
+             ' with this extension in current directory, otherwise files in input directory', metavar='')
 
     parser.add_argument(
-        '-d','--input_dir', nargs='+', type=str, required=False, default='.',
+        '-d','--input_dir', nargs='+', type=str, required=False, default='.', metavar='',
         help='Directory which contains data for identification, when not specified files in current directory will be analyzed.')
     return parser.parse_args()
 
