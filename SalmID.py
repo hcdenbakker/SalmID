@@ -19,16 +19,25 @@ def parse_args():
     parser = ArgumentParser(description='SalmID - rapid Kmer based Salmonella identifier from raw data')
     # inputs
     parser.add_argument(
-        '-i','--input', nargs='+', type=str, required=False, default= 'None',
-        help='Single fastq.gz file input, include path to file if file is not in same directory ', metavar='')
+        '-i','--input_file', type=str, required=False, default= 'None', metavar = 'your_fastqgz',
+        help='Single fastq.gz file input, include path to file if file is not in same directory ')
     parser.add_argument(
-        '-e', '--extension', nargs='+', type=str, required=False, default=['.fastq.gz'],
+        '-e', '--extension', type=str, required=False, default=['.fastq.gz'], metavar = 'file_extension',
         help='File extension, if specified without "--input_dir", SalmID will attempt to ID all files\n' +
-             ' with this extension in current directory, otherwise files in input directory', metavar='')
+             ' with this extension in current directory, otherwise files in input directory')
 
     parser.add_argument(
-        '-d','--input_dir', nargs='+', type=str, required=False, default='.', metavar='',
+        '-d','--input_dir', type=str, required=False, default='.', metavar = 'directory',
         help='Directory which contains data for identification, when not specified files in current directory will be analyzed.')
+    parser.add_argument(
+        '-r', '--report', type=str, required=False, default=['percentage'], metavar = 'percentage or cov',
+        help='Report either percentage ("percentage") of clade specific kmers recovered, or average kmer-frequency ("cov")')
+    parser.add_argument(
+        '-m', '--mode', type=str, required=False, default=['quick'], metavar = 'quick or thorough',
+        help='Quick [quick] or thorough [thorough] mode')
+
+
+
     return parser.parse_args()
 
 
@@ -50,7 +59,7 @@ def createKmerDict_reads(list_of_strings, kmer):
     return kmer_table
 
 
-def target_read_kmerizer_multi(file, k, kmerDict_1, kmerDict_2):
+def target_read_kmerizer_multi(file, k, kmerDict_1, kmerDict_2, mode):
     mean_1 = None
     mean_2 = None
     i = 1
@@ -73,8 +82,9 @@ def target_read_kmerizer_multi(file, k, kmerDict_1, kmerDict_2):
                 total_coverage_2 += len(line)
                 reads_2.append(line.decode())
         i += 1
-        if total_coverage_2 >= 20000:
-            break
+        if mode == 'quick':
+            if total_coverage_2 >= 20000:
+                break
 
     if len(reads_1) == 0:
         kmer_Dict1 = {}
@@ -118,12 +128,12 @@ def kmer_lists(query_fastq_gz, k,
                uniqmers_S_enterica_rpoB,
                uniqmers_Escherichia_rpoB,
                uniqmers_Listeria_ss_rpoB,
-               uniqmers_Lmono_rpoB):
+               uniqmers_Lmono_rpoB,
+               mode):
     dict_invA, dict_rpoB, mean_invA, mean_rpoB = target_read_kmerizer_multi(query_fastq_gz, k, allmers,
-                                                                            allmers_rpoB)
+                                                                            allmers_rpoB, mode)
     target_mers_invA = set([key for key in dict_invA])
     target_mers_rpoB = set([key for key in dict_rpoB])
-    # target_mers_rpoB = target_read_kmerizer(query_fastq_gz, 27, allmers_rpoB)
     if target_mers_invA == 0:
         print('No reads found matching invA, no Salmonella in sample?')
     else:
@@ -172,16 +182,17 @@ def kmer_lists(query_fastq_gz, k,
 
 
 def main():
-    #todo: introduce single and batch modes, batch mode with or without
     ex_dir = os.path.dirname(os.path.realpath(__file__))
     args = parse_args()
-    input = args.input[0]
-    if input != 'N':
-        files = [input]
+    input_file = args.input_file
+    if input_file != 'None':
+        files = [input_file]
     else:
         extension = args.extension[0]
         inputdir = args.input_dir[0]
         files = [inputdir + '/'+ f for f in os.listdir(inputdir) if f.endswith(extension)]
+    report = args.report
+    mode = args.mode
     f_invA = open(ex_dir + "/invA_mers_dict", "rb")
     sets_dict_invA = pickle.load(f_invA)
     f_invA.close()
@@ -229,12 +240,17 @@ def main():
                    uniqmers_S_enterica_rpoB,
                    uniqmers_Escherichia_rpoB,
                    uniqmers_Listeria_ss_rpoB,
-                   uniqmers_Lmono_rpoB)
+                   uniqmers_Lmono_rpoB,
+                   mode)
         if sum(locus_scores) == 0:
             print(f.split('/')[-1] + ' does not contain Salmonella, Escherichia or Listeria sensu stricto')
         else:
-            pretty_scores = [str(round(score)) for score in locus_scores]
-            print(f.split('/')[-1] +'\t' + '\t'.join(pretty_scores))
+            if report == 'percentage':
+                pretty_scores = [str(round(score)) for score in locus_scores]
+                print(f.split('/')[-1] +'\t' + '\t'.join(pretty_scores))
+            else:
+                pretty_covs = [str(round(cov, 1)) for cov in coverages]
+                print(f.split('/')[-1] + '\t' + '\t'.join(pretty_covs))
 
 if __name__ == '__main__':
     main()
