@@ -188,8 +188,8 @@ def main():
     if input_file != 'None':
         files = [input_file]
     else:
-        extension = args.extension[0]
-        inputdir = args.input_dir[0]
+        extension = args.extension
+        inputdir = args.input_dir
         files = [inputdir + '/'+ f for f in os.listdir(inputdir) if f.endswith(extension)]
     report = args.report
     mode = args.mode
