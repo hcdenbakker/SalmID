@@ -30,10 +30,10 @@ def parse_args():
         '-d','--input_dir', type=str, required=False, default='.', metavar = 'directory',
         help='Directory which contains data for identification, when not specified files in current directory will be analyzed.')
     parser.add_argument(
-        '-r', '--report', type=str, required=False, default=['percentage'], metavar = 'percentage or cov',
+        '-r', '--report', type=str, required=False, default='percentage', metavar = 'percentage or cov',
         help='Report either percentage ("percentage") of clade specific kmers recovered, or average kmer-frequency ("cov")')
     parser.add_argument(
-        '-m', '--mode', type=str, required=False, default=['quick'], metavar = 'quick or thorough',
+        '-m', '--mode', type=str, required=False, default='quick', metavar = 'quick or thorough',
         help='Quick [quick] or thorough [thorough] mode')
 
 
