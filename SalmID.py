@@ -6,6 +6,10 @@ import io
 import pickle
 import os
 from argparse import ArgumentParser
+try:
+	from version import SalmID_version
+except:
+    SalmID_version = "version unknown"
 
 
 def reverse_complement(sequence):
@@ -16,8 +20,9 @@ def reverse_complement(sequence):
 
 def parse_args():
     "Parse the input arguments, use '-h' for help."
-    parser = ArgumentParser(description='SalmID - rapid Kmer based Salmonella identifier from raw data')
+    parser = ArgumentParser(description='SalmID - rapid Kmer based Salmonella identifier from sequence data')
     # inputs
+    parser.add_argument('-v','--version', action='version', version='%(prog)s ' + SalmID_version)
     parser.add_argument(
         '-i','--input_file', type=str, required=False, default= 'None', metavar = 'your_fastqgz',
         help='Single fastq.gz file input, include path to file if file is not in same directory ')
