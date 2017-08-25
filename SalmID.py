@@ -225,9 +225,9 @@ def main():
     uniqmers_Lmono_rpoB = sets_dict['uniqmers_L_mono']
     print(
         'file\tListeria sensu stricto (rpoB)\tL. monocytogenes (rpoB)\tEscherichia spp. (rpoB)\tS. bongori (rpoB)\tS. enterica' +
-        '(rpoB)\tS. bongori (invA)\tsubsp. I (invA)\tsubsp. IIa (invA)\tsubsp. IIb' +
-        ' (invA)\tsubsp. IIIa (invA)\tsubsp. IIIb (invA)\tsubsp.IV (invA)\tsubsp. VI (invA)\tsubsp. VII (invA)' +
-        '\tsubsp. VIII (prov.) (invA)')
+        '(rpoB)\tS. bongori (invA)\tsubsp. I (invA)\tsubsp. II (clade a: invA)\tsubsp. II' +
+        ' (clade b: invA)\tsubsp. IIIa (invA)\tsubsp. IIIb (invA)\tsubsp.IV (invA)\tsubsp. VI (invA)\tsubsp. VII (invA)' +
+        '\tsubsp. II (clade VIII : invA)')
     for f in files:
         locus_scores, coverages = kmer_lists( f, 27,
                    allmers,allmers_rpoB,
