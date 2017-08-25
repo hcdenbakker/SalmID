@@ -247,15 +247,13 @@ def main():
                    uniqmers_Listeria_ss_rpoB,
                    uniqmers_Lmono_rpoB,
                    mode)
-        if sum(locus_scores) == 0:
-            print(f.split('/')[-1] + ' does not contain Salmonella, Escherichia or Listeria sensu stricto')
+
+        if report == 'percentage':
+            pretty_scores = [str(round(score)) for score in locus_scores]
+            print(f.split('/')[-1] +'\t' + '\t'.join(pretty_scores))
         else:
-            if report == 'percentage':
-                pretty_scores = [str(round(score)) for score in locus_scores]
-                print(f.split('/')[-1] +'\t' + '\t'.join(pretty_scores))
-            else:
-                pretty_covs = [str(round(cov, 1)) for cov in coverages]
-                print(f.split('/')[-1] + '\t' + '\t'.join(pretty_covs))
+            pretty_covs = [str(round(cov, 1)) for cov in coverages]
+            print(f.split('/')[-1] + '\t' + '\t'.join(pretty_covs))
 
 if __name__ == '__main__':
     main()
