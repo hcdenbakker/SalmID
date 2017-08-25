@@ -27,7 +27,7 @@ def parse_args():
         '-i','--input_file', type=str, required=False, default= 'None', metavar = 'your_fastqgz',
         help='Single fastq.gz file input, include path to file if file is not in same directory ')
     parser.add_argument(
-        '-e', '--extension', type=str, required=False, default=['.fastq.gz'], metavar = 'file_extension',
+        '-e', '--extension', type=str, required=False, default= '.fastq.gz', metavar = 'file_extension',
         help='File extension, if specified without "--input_dir", SalmID will attempt to ID all files\n' +
              ' with this extension in current directory, otherwise files in input directory')
 
