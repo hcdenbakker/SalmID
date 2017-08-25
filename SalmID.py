@@ -177,10 +177,9 @@ def kmer_lists(query_fastq_gz, k,
                                                        uniqmers_Listeria_ss_rpoB)
         Lmono_rpoB_cov = mean_cov_selected_kmers((uniqmers_Lmono_rpoB & target_mers_rpoB), dict_rpoB,
                                                  uniqmers_Lmono_rpoB)
-        coverages = [Listeria_ss_rpoB_cov, Lmono_rpoB_cov, S_bongori_rpoB_cov, S_enterica_rpoB_cov,
-                     Escherichia_rpoB_cov, bongori_invA_cov, I_invA_cov,IIa_invA_cov, IIb_invA_cov,
-                     IIIa_invA_cov, IIIb_invA_cov, IV_invA_cov, VI_invA_cov, VII_invA_cov,
-                     VIII_invA_cov]
+        coverages = [Listeria_ss_rpoB_cov, Lmono_rpoB_cov, Escherichia_rpoB_cov, S_bongori_rpoB_cov,
+                     S_enterica_rpoB_cov, bongori_invA_cov, I_invA_cov, IIa_invA_cov, IIb_invA_cov,
+                     IIIa_invA_cov, IIIb_invA_cov, IV_invA_cov, VI_invA_cov, VII_invA_cov, VIII_invA_cov]
         locus_scores = [p_Listeria_ss, p_Lmono, p_Escherichia, p_bongori_rpoB, p_Senterica, p_bongori,
                         p_I, p_IIa,p_IIb, p_IIIb, p_IIIa, p_IV, p_VI, p_VII, p_VIII]
     return locus_scores, coverages
