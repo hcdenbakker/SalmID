@@ -35,15 +35,26 @@ def parse_args():
         '-d','--input_dir', type=str, required=False, default='.', metavar = 'directory',
         help='Directory which contains data for identification, when not specified files in current directory will be analyzed.')
     parser.add_argument(
-        '-r', '--report', type=str, required=False, default='percentage', metavar = 'percentage or cov',
-        help='Report either percentage ("percentage") of clade specific kmers recovered, or average kmer-frequency ("cov")')
+        '-r', '--report', type=str, required=False, default='percentage', metavar = 'percentage, coverage or taxonomy',
+        help='Report either percentage ("percentage") of clade specific kmers recovered, average kmer-coverage ("cov"), or '
+             'taxonomy (taxonomic species ID, plus observed mean k-mer coverages and expected coverage).')
     parser.add_argument(
         '-m', '--mode', type=str, required=False, default='quick', metavar = 'quick or thorough',
         help='Quick [quick] or thorough [thorough] mode')
-
-
-
     return parser.parse_args()
+
+def get_av_read_length(file):
+    i = 1
+    n_reads = 0
+    total_length = 0
+    for line in io.BufferedReader(gzip.open(file)):
+        if i % 4 == 2:
+            total_length += len(line.strip())
+            n_reads +=1
+        i += 1
+        if n_reads == 100:
+            break
+    return total_length/100
 
 
 def createKmerDict_reads(list_of_strings, kmer):
@@ -74,9 +85,11 @@ def target_read_kmerizer_multi(file, k, kmerDict_1, kmerDict_2, mode):
     total_coverage_2 = 0
     reads_1 = []
     reads_2 = []
+    total_reads = 0
     for line in io.BufferedReader(gzip.open(file)):
         start = int((len(line) - k) // 2)
         if i % 4 == 2:
+            total_reads += 1
             s1 = line[start:k + start].decode()
             if s1 in kmerDict_1:
                 n_reads_1 += 1
@@ -103,7 +116,7 @@ def target_read_kmerizer_multi(file, k, kmerDict_1, kmerDict_2, mode):
         kmer_Dict2 = createKmerDict_reads(reads_2, k)
         mers_2 = set([key for key in kmer_Dict2])
         mean_2 = sum([kmer_Dict2[key] for key in kmer_Dict2])/len(mers_2)
-    return kmer_Dict1, kmer_Dict2, mean_1, mean_2
+    return kmer_Dict1, kmer_Dict2, mean_1, mean_2, total_reads
 
 def mean_cov_selected_kmers(iterable, kmer_dict, clade_specific_kmers):
     '''
@@ -135,7 +148,7 @@ def kmer_lists(query_fastq_gz, k,
                uniqmers_Listeria_ss_rpoB,
                uniqmers_Lmono_rpoB,
                mode):
-    dict_invA, dict_rpoB, mean_invA, mean_rpoB = target_read_kmerizer_multi(query_fastq_gz, k, allmers,
+    dict_invA, dict_rpoB, mean_invA, mean_rpoB , total_reads = target_read_kmerizer_multi(query_fastq_gz, k, allmers,
                                                                             allmers_rpoB, mode)
     target_mers_invA = set([key for key in dict_invA])
     target_mers_rpoB = set([key for key in dict_rpoB])
@@ -182,7 +195,33 @@ def kmer_lists(query_fastq_gz, k,
                      IIIa_invA_cov, IIIb_invA_cov, IV_invA_cov, VI_invA_cov, VII_invA_cov, VIII_invA_cov]
         locus_scores = [p_Listeria_ss, p_Lmono, p_Escherichia, p_bongori_rpoB, p_Senterica, p_bongori,
                         p_I, p_IIa,p_IIb, p_IIIa, p_IIIb, p_IV, p_VI, p_VII, p_VIII]
-    return locus_scores, coverages
+    return locus_scores, coverages, total_reads
+
+def report_taxon(locus_covs, average_read_length, number_of_reads):
+    list_taxa = [ 'Listeria ss', 'Listeria monocytogenes', 'Escherichia sp.',
+                  'Salmonella bongori (rpoB)', 'Salmonella enterica (rpoB)',
+                  'Salmonella bongori (invA)', 'S. enterica subsp. enterica (invA)',
+                  'S. enterica subsp. salamae (invA: clade a)','S. enterica subsp. salamae (invA: clade b)',
+                  'S. enterica subsp. arizonae (invA)', 'S. enterica subsp. diarizonae (invA)',
+                  'S. enterica subsp. houtenae (invA)', 'S. enterica subsp. indica (invA)',
+                  'S. enterica subsp. VII (invA)', 'S. enterica subsp. salamae (invA: clade VIII)']
+    if sum(locus_covs) == 0:
+        pass
+        #taxon = 'No target taxon detected'
+    else:
+        # given list of scores get taxon
+        best_rpoB = max(range(len(locus_covs[1:5])), key=lambda x: locus_covs[1:5][x])+1
+        rpoB = (list_taxa[best_rpoB], locus_covs[best_rpoB])
+        if sum(locus_covs[5:]) > 0:
+            best_invA = max(range(len(locus_covs[5:])), key=lambda x: locus_covs[5:][x])+5
+            invA = (list_taxa[best_invA], locus_covs[best_invA])
+        else:
+            invA = ('No invA matches!', 0)
+        if 'Listeria' in rpoB[0]:
+            return rpoB, invA, (average_read_length * number_of_reads) / 3000000
+        else:
+            return rpoB, invA, (average_read_length * number_of_reads) / 5000000
+
 
 
 def main():
@@ -222,37 +261,82 @@ def main():
     uniqmers_Escherichia_rpoB = sets_dict['uniqmers_Escherichia']
     uniqmers_Listeria_ss_rpoB = sets_dict['uniqmers_Listeria_ss']
     uniqmers_Lmono_rpoB = sets_dict['uniqmers_L_mono']
-    print(
+    if report == 'taxonomy':
+        print('file\trpoB\tinvA\texpected coverage')
+        for f in files:
+            locus_scores, coverages, reads = kmer_lists(f, 27,
+                                                        allmers, allmers_rpoB,
+                                                        uniqmers_bongori,
+                                                        uniqmers_I,
+                                                        uniqmers_IIa,
+                                                        uniqmers_IIb,
+                                                        uniqmers_IIIa,
+                                                        uniqmers_IIIb,
+                                                        uniqmers_IV,
+                                                        uniqmers_VI,
+                                                        uniqmers_VII,
+                                                        uniqmers_VIII,
+                                                        uniqmers_bongori_rpoB,
+                                                        uniqmers_S_enterica_rpoB,
+                                                        uniqmers_Escherichia_rpoB,
+                                                        uniqmers_Listeria_ss_rpoB,
+                                                        uniqmers_Lmono_rpoB,
+                                                        mode)
+            pretty_covs = [round(cov, 1) for cov in coverages]
+            report = report_taxon(pretty_covs, get_av_read_length(f), reads)
+            print(f.split('/')[-1] + '\t' + report[0][0] + '[' + str(report[0][1]) + ']' + '\t' + report[1][0] +
+                  '[' + str(report[1][1]) + ']' +
+                  '\t' + str(round(report[2], 1)))
+    else:
+        print(
         'file\tListeria sensu stricto (rpoB)\tL. monocytogenes (rpoB)\tEscherichia spp. (rpoB)\tS. bongori (rpoB)\tS. enterica' +
         '(rpoB)\tS. bongori (invA)\tsubsp. I (invA)\tsubsp. II (clade a: invA)\tsubsp. II' +
         ' (clade b: invA)\tsubsp. IIIa (invA)\tsubsp. IIIb (invA)\tsubsp.IV (invA)\tsubsp. VI (invA)\tsubsp. VII (invA)' +
         '\tsubsp. II (clade VIII : invA)')
-    for f in files:
-        locus_scores, coverages = kmer_lists( f, 27,
-                   allmers,allmers_rpoB,
-                   uniqmers_bongori,
-                   uniqmers_I,
-                   uniqmers_IIa,
-                   uniqmers_IIb,
-                   uniqmers_IIIa,
-                   uniqmers_IIIb,
-                   uniqmers_IV,
-                   uniqmers_VI,
-                   uniqmers_VII,
-                   uniqmers_VIII,
-                   uniqmers_bongori_rpoB,
-                   uniqmers_S_enterica_rpoB,
-                   uniqmers_Escherichia_rpoB,
-                   uniqmers_Listeria_ss_rpoB,
-                   uniqmers_Lmono_rpoB,
-                   mode)
-
         if report == 'percentage':
-            pretty_scores = [str(round(score)) for score in locus_scores]
-            print(f.split('/')[-1] +'\t' + '\t'.join(pretty_scores))
+            for f in files:
+                locus_scores, coverages , reads = kmer_lists( f, 27,
+                           allmers,allmers_rpoB,
+                           uniqmers_bongori,
+                           uniqmers_I,
+                           uniqmers_IIa,
+                           uniqmers_IIb,
+                           uniqmers_IIIa,
+                           uniqmers_IIIb,
+                           uniqmers_IV,
+                           uniqmers_VI,
+                           uniqmers_VII,
+                           uniqmers_VIII,
+                           uniqmers_bongori_rpoB,
+                           uniqmers_S_enterica_rpoB,
+                           uniqmers_Escherichia_rpoB,
+                           uniqmers_Listeria_ss_rpoB,
+                           uniqmers_Lmono_rpoB,
+                           mode)
+                pretty_scores = [str(round(score)) for score in locus_scores]
+                print(f.split('/')[-1] +'\t' + '\t'.join(pretty_scores))
         else:
-            pretty_covs = [str(round(cov, 1)) for cov in coverages]
-            print(f.split('/')[-1] + '\t' + '\t'.join(pretty_covs))
+            for f in files:
+                locus_scores, coverages , reads = kmer_lists( f, 27,
+                           allmers,allmers_rpoB,
+                           uniqmers_bongori,
+                           uniqmers_I,
+                           uniqmers_IIa,
+                           uniqmers_IIb,
+                           uniqmers_IIIa,
+                           uniqmers_IIIb,
+                           uniqmers_IV,
+                           uniqmers_VI,
+                           uniqmers_VII,
+                           uniqmers_VIII,
+                           uniqmers_bongori_rpoB,
+                           uniqmers_S_enterica_rpoB,
+                           uniqmers_Escherichia_rpoB,
+                           uniqmers_Listeria_ss_rpoB,
+                           uniqmers_Lmono_rpoB,
+                           mode)
+                pretty_covs = [str(round(cov, 1)) for cov in coverages]
+                print(f.split('/')[-1] + '\t' + '\t'.join(pretty_covs))
 
 if __name__ == '__main__':
     main()
