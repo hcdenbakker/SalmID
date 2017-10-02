@@ -205,13 +205,23 @@ def report_taxon(locus_covs, average_read_length, number_of_reads):
                   'S. enterica subsp. arizonae (invA)', 'S. enterica subsp. diarizonae (invA)',
                   'S. enterica subsp. houtenae (invA)', 'S. enterica subsp. indica (invA)',
                   'S. enterica subsp. VII (invA)', 'S. enterica subsp. salamae (invA: clade VIII)']
-    if sum(locus_covs) == 0:
-        pass
-        #taxon = 'No target taxon detected'
+    if sum(locus_covs) < 1:
+        rpoB = ('No rpoB matches!', 0)
+        invA = ('No invA matches!', 0)
+        return rpoB, invA, 0.0
     else:
         # given list of scores get taxon
-        best_rpoB = max(range(len(locus_covs[1:5])), key=lambda x: locus_covs[1:5][x])+1
-        rpoB = (list_taxa[best_rpoB], locus_covs[best_rpoB])
+        if sum(locus_covs[0:5]) > 0:
+            best_rpoB = max(range(len(locus_covs[1:5])), key=lambda x: locus_covs[1:5][x])+1
+            all_rpoB = max(range(len(locus_covs[0:5])), key=lambda x: locus_covs[0:5][x])
+            if (locus_covs[best_rpoB] != 0) & (all_rpoB == 0):
+                rpoB = (list_taxa[best_rpoB], locus_covs[best_rpoB])
+            elif (all_rpoB == 0) &  (round(sum(locus_covs[1:5]),1) < 1):
+                rpoB = (list_taxa[0], locus_covs[0])
+            else:
+                rpoB = (list_taxa[best_rpoB], locus_covs[best_rpoB])
+        else:
+            rpoB = ('No rpoB matches!', 0)
         if sum(locus_covs[5:]) > 0:
             best_invA = max(range(len(locus_covs[5:])), key=lambda x: locus_covs[5:][x])+5
             invA = (list_taxa[best_invA], locus_covs[best_invA])
@@ -261,6 +271,7 @@ def main():
     uniqmers_Escherichia_rpoB = sets_dict['uniqmers_Escherichia']
     uniqmers_Listeria_ss_rpoB = sets_dict['uniqmers_Listeria_ss']
     uniqmers_Lmono_rpoB = sets_dict['uniqmers_L_mono']
+    #todo: run kmer_lists() once, create list of tuples containing data to be used fro different reports
     if report == 'taxonomy':
         print('file\trpoB\tinvA\texpected coverage')
         for f in files:
