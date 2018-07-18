@@ -47,7 +47,11 @@ def get_av_read_length(file):
     i = 1
     n_reads = 0
     total_length = 0
-    for line in io.BufferedReader(gzip.open(file)):
+    if file.endswith(".gz"):
+        file_content=io.BufferedReader(gzip.open(file))
+    else:
+        file_content=open(file,"r").readlines()
+    for line in file_content:
         if i % 4 == 2:
             total_length += len(line.strip())
             n_reads +=1
@@ -86,22 +90,30 @@ def target_read_kmerizer_multi(file, k, kmerDict_1, kmerDict_2, mode):
     reads_1 = []
     reads_2 = []
     total_reads = 0
-    for line in io.BufferedReader(gzip.open(file)):
+    if file.endswith(".gz"):
+      file_content=io.BufferedReader(gzip.open(file))
+    else:
+      file_content=open(file,"r").readlines()
+    for line in file_content:
         start = int((len(line) - k) // 2)
         if i % 4 == 2:
             total_reads += 1
-            s1 = line[start:k + start].decode()
+            if file.endswith(".gz"):
+                s1 = line[start:k + start].decode()
+                line=line.decode()
+            else:
+                s1 = line[start:k + start]
             if s1 in kmerDict_1:
                 n_reads_1 += 1
                 total_coverage_1 += len(line)
-                reads_1.append(line.decode())
+                reads_1.append(line)
             if s1 in kmerDict_2:
                 n_reads_2 += 1
                 total_coverage_2 += len(line)
-                reads_2.append(line.decode())
+                reads_2.append(line)
         i += 1
         if mode == 'quick':
-            if total_coverage_2 >= 20000:
+            if total_coverage_2 >= 800000:
                 break
 
     if len(reads_1) == 0:
