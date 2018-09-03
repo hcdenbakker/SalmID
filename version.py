@@ -1,1 +1,1 @@
-SalmID_version = '0.11'
+SalmID_version = '0.12'
