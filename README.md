@@ -5,7 +5,13 @@ Rapid tool to check taxonomic ID of single isolate samples. Currently only IDs S
 Python 3
 
 ## Installation:
-Clone git to your machine:
+The easy way with homebrew ([Linux](http://linuxbrew.sh/) or [MacOS](https://brew.sh/)):
+```
+brew install brewsci/bio/salmid
+```
+Big thanks to [Torsten Seemann]([https://tseemann.github.io/]) for including this in homebrew!
+
+Alernatively git clone to your machine:
 ```
 git clone --recursive https://github.com/hcdenbakker/SalmID.git
 ```
