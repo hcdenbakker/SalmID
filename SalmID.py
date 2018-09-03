@@ -41,6 +41,9 @@ def parse_args():
     parser.add_argument(
         '-m', '--mode', type=str, required=False, default='quick', metavar = 'quick or thorough',
         help='Quick [quick] or thorough [thorough] mode')
+    if len(sys.argv)==1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
     return parser.parse_args()
 
 def get_av_read_length(file):
