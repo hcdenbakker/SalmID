@@ -30,7 +30,7 @@ Add the SalmID folder to your path
 
 To execute:
 ```
-SalmID.py
+SalmID.py -e .fastq.gz
 ```
 This will perform a SalmID run on all fastq.gz files in the current directory.
 ```
