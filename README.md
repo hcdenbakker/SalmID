@@ -9,7 +9,7 @@ The easy way with homebrew ([Linux](http://linuxbrew.sh/) or [MacOS](https://bre
 ```
 brew install brewsci/bio/salmid
 ```
-Big thanks to [Torsten Seemann]([https://tseemann.github.io/]) for including this in homebrew!
+Big thanks to [Torsten Seemann](https://tseemann.github.io/) for including this in homebrew!
 
 Alernatively git clone to your machine:
 ```
