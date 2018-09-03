@@ -5,6 +5,8 @@ import gzip
 import io
 import pickle
 import os
+import sys
+
 from argparse import ArgumentParser
 try:
 	from version import SalmID_version
