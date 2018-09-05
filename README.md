@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/97020646.svg)](https://zenodo.org/badge/latestdoi/97020646)
+
 # SalmID
 Rapid tool to check taxonomic ID of single isolate samples. Currently only IDs Salmonella species and subspecies, and some common contaminants (Listeria, Escherichia).
 
