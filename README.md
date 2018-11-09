@@ -13,22 +13,24 @@ brew install brewsci/bio/salmid
 ```
 Big thanks to [Torsten Seemann](https://tseemann.github.io/) for including this in homebrew!
 
-Alernatively git clone to your machine:
-```
-git clone --recursive https://github.com/hcdenbakker/SalmID.git
+Alternatively download from GitHub:
+
+```bash
+git clone https://github.com/hcdenbakker/SalmID.git
 ```
 
-Make SalmID executable:
-```
+build a wheel using [poetry](https://poetry.eustace.io/):
+
+```bash
 cd SalmID
+poetry build
 ```
 
-```
-chmod +x SalmID.py
-```
+and install using `pip`
 
-
-Add the SalmID folder to your path
+```bash
+pip install dist/salmid*.whl
+```
 
 To execute:
 ```
